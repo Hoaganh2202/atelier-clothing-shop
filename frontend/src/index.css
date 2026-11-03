@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 38 40% 97%;
+    --foreground: 240 6% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 6% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 6% 10%;
+
+    --primary: 240 6% 10%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 36 27% 94%;
+    --secondary-foreground: 240 6% 10%;
+
+    --muted: 36 27% 94%;
+    --muted-foreground: 32 7% 40%;
+
+    --accent: 34 23% 89%;
+    --accent-foreground: 240 6% 10%;
+
+    --destructive: 17 88% 40%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 33 22% 86%;
+    --input: 33 22% 86%;
+    --ring: 240 6% 10%;
+
+    --radius: 6px;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased font-sans min-h-screen;
+  }
+}

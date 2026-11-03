@@ -1,0 +1,30 @@
+﻿# Docker Compose — tùy chọn (optional)
+# Dùng nếu bạn không cài MySQL trực tiếp trên máy.
+# Nếu đã có MySQL cài sẵn (Windows service) thì bỏ qua file này.
+#
+# Cách dùng:
+#   1. cp .env.example .env  và điền giá trị
+#   2. docker compose up -d
+#   3. Kết nối Spring Boot qua localhost:
+
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: clothing_shop_db
+      MYSQL_USER: shop
+      MYSQL_PASSWORD: 
+      MYSQL_ROOT_PASSWORD: 
+    ports:
+      - ":3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-pMYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:

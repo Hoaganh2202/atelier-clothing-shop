@@ -1,0 +1,25 @@
+# ─── Application Local (template) ────────────────────────────────────────────
+# Copy this file to application-local.yml and fill in your values.
+# application-local.yml is listed in .gitignore and must NEVER be committed.
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/clothing_shop_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: shop
+    # DB_PASSWORD: password for the 'shop' MySQL user
+    password: 'your_db_password_here'
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+app:
+  jwt:
+    # JWT_SECRET: minimum 64 random bytes encoded as hex (128 hex chars).
+    # Generate with PowerShell:
+    #    = New-Object byte[] 64
+    #   [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes()
+    #   -join ( | ForEach-Object { .ToString('x2') })
+    secret: 'your_128_hex_char_jwt_secret_here'
+  cors:
+    allowed-origins: 'http://localhost:5173'
+
+# NOTE: When using Docker Compose (optional), MySQL is exposed on port 3307.
+# Change the url above to port 3307 if needed.

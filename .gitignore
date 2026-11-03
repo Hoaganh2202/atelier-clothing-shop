@@ -1,0 +1,53 @@
+# ==========================================
+# Root Monorepo .gitignore
+# ==========================================
+
+# --- Backend ---
+backend/target/
+backend/*.log
+backend/.idea/
+backend/.settings/
+backend/.classpath
+backend/.project
+backend/.factorypath
+backend/bin/
+backend/uploads/
+!backend/uploads/.gitkeep
+
+# --- Frontend ---
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/*.tsbuildinfo
+frontend/*.local
+frontend/.eslintcache
+
+# --- Secrets & Environment Variables ---
+.env
+.env.*
+!.env.example
+*.env
+backend/.env
+frontend/.env
+*.local
+
+# --- Database Dumps & Backups ---
+backups/*.sql
+backups/*.png
+
+# --- Uploads & Media ---
+uploads/*
+!uploads/.gitkeep
+
+# --- IDEs & System Files ---
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# --- Team Git Backups ---
+*.git_closet_backup/
