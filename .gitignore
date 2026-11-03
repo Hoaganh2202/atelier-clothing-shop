@@ -31,9 +31,12 @@ backend/.env
 frontend/.env
 *.local
 
-# --- Database Dumps & Backups ---
-backups/*.sql
-backups/*.png
+# --- Database Dumps & Local Scripts ---
+backups/
+*.ps1
+
+# --- Root Markdown Docs ---
+/*.md
 
 # --- Uploads & Media ---
 uploads/*
