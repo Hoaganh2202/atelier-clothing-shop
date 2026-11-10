@@ -206,7 +206,7 @@ export const ProductCatalogPage: React.FC = () => {
     if (!categoryIdParam) return null;
     const findCat = (list: CategoryPublicResponse[]): string | null => {
       for (const item of list) {
-        if (item.id === categoryIdParam) return item.name || null;
+        if (item.id === categoryIdParam) return (item.slug === 'ao-ba-lo' ? 'Áo Ba Lỗ' : item.name) || null;
         if (item.children) {
           const sub = findCat(item.children);
           if (sub) return sub;
@@ -280,7 +280,7 @@ export const ProductCatalogPage: React.FC = () => {
                               : 'text-muted-foreground hover:text-foreground hover:bg-secondary/40'
                           }`}
                         >
-                          {sub.name}
+                          {sub.slug === 'ao-ba-lo' ? 'Áo Ba Lỗ' : sub.name}
                         </button>
                       );
                     })}

@@ -69,7 +69,7 @@ const getInitials = (name?: string | null): string => {
 export const Header: React.FC<HeaderProps> = ({
   cartCount,
   onCartClick,
-  searchQuery = '',
+  searchQuery,
   onSearchChange,
   activeNav,
   onNavClick,
@@ -81,6 +81,34 @@ export const Header: React.FC<HeaderProps> = ({
   const isAuthenticated = Boolean(accessToken && user);
   const storeCartCount = useCartStore((state) => state.getTotalItems());
   const effectiveCartCount = cartCount !== undefined ? cartCount : storeCartCount;
+
+  const [internalSearchQuery, setInternalSearchQuery] = useState<string>(() => {
+    if (searchQuery !== undefined) return searchQuery;
+    const params = new URLSearchParams(location.search);
+    return params.get('keyword') || '';
+  });
+
+  useEffect(() => {
+    if (searchQuery !== undefined) {
+      setInternalSearchQuery(searchQuery);
+    }
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (searchQuery === undefined) {
+      const params = new URLSearchParams(location.search);
+      setInternalSearchQuery(params.get('keyword') || '');
+    }
+  }, [location.pathname, location.search, searchQuery]);
+
+  const effectiveSearchQuery = searchQuery !== undefined ? searchQuery : internalSearchQuery;
+
+  const handleSearchInputChange = (value: string) => {
+    setInternalSearchQuery(value);
+    if (onSearchChange) {
+      onSearchChange(value);
+    }
+  };
 
   const { data: categories = [], isLoading: isCategoriesLoading } = useCategories();
 
@@ -97,8 +125,17 @@ export const Header: React.FC<HeaderProps> = ({
 
   const [activeMegaMenu, setActiveMegaMenu] = useState<'men' | 'women' | null>(null);
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const megaMenuOpenedAtRef = useRef<number>(0);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const megaMenuContainerRef = useRef<HTMLDivElement>(null);
+  const megaMenuPanelRef = useRef<HTMLDivElement>(null);
+
+  const formatCategoryName = (slug?: string, name?: string) => {
+    if (slug === 'ao-ba-lo') {
+      return 'Áo Ba Lỗ';
+    }
+    return name || '';
+  };
 
   const currentNavId = useMemo(() => {
     if (activeNav) return activeNav;
@@ -117,7 +154,12 @@ export const Header: React.FC<HeaderProps> = ({
       clearTimeout(closeTimerRef.current);
       closeTimerRef.current = null;
     }
-    setActiveMegaMenu(type);
+    setActiveMegaMenu((prev) => {
+      if (prev !== type) {
+        megaMenuOpenedAtRef.current = Date.now();
+      }
+      return type;
+    });
   };
 
   const handleMouseLeave = () => {
@@ -138,7 +180,20 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const handleToggleMegaMenu = (type: 'men' | 'women') => {
-    setActiveMegaMenu((prev) => (prev === type ? null : type));
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setActiveMegaMenu((prev) => {
+      if (prev !== type) {
+        megaMenuOpenedAtRef.current = Date.now();
+        return type;
+      }
+      if (Date.now() - megaMenuOpenedAtRef.current < 400) {
+        return type;
+      }
+      return null;
+    });
   };
 
   // Preview testing params support
@@ -172,10 +227,10 @@ export const Header: React.FC<HeaderProps> = ({
     };
 
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      if (
-        megaMenuContainerRef.current &&
-        !megaMenuContainerRef.current.contains(event.target as Node)
-      ) {
+      const target = event.target as Node;
+      const isInsideNav = megaMenuContainerRef.current?.contains(target) ?? false;
+      const isInsidePanel = megaMenuPanelRef.current?.contains(target) ?? false;
+      if (!isInsideNav && !isInsidePanel) {
         handleCloseMegaMenu();
       }
     };
@@ -224,9 +279,36 @@ export const Header: React.FC<HeaderProps> = ({
     };
   }, []);
 
-  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && searchQuery.trim()) {
-      navigate(`/products?keyword=${encodeURIComponent(searchQuery.trim())}`);
+  const handleSubmitSearch = (closeMobileDrawer = false) => {
+    const trimmed = effectiveSearchQuery.trim();
+    if (!trimmed) return;
+    if (closeMobileDrawer) {
+      setIsMobileNavOpen(false);
+    }
+    handleCloseMegaMenu();
+
+    if (location.pathname === '/products') {
+      const nextParams = new URLSearchParams(location.search);
+      if (nextParams.get('keyword') === trimmed && !nextParams.get('page')) {
+        return;
+      }
+      nextParams.set('keyword', trimmed);
+      nextParams.delete('page');
+      navigate(`/products?${nextParams.toString()}`);
+      return;
+    }
+    navigate(`/products?keyword=${encodeURIComponent(trimmed)}`);
+  };
+
+  const handleSearchFormSubmit = (e: React.FormEvent<HTMLFormElement>, closeMobileDrawer = false) => {
+    e.preventDefault();
+    handleSubmitSearch(closeMobileDrawer);
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, closeMobileDrawer = false) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSubmitSearch(closeMobileDrawer);
     }
   };
 
@@ -303,7 +385,12 @@ export const Header: React.FC<HeaderProps> = ({
                   <button
                     type="button"
                     onClick={() => handleToggleMegaMenu(item.megaMenu!)}
-                    onFocus={() => handleMouseEnter(item.megaMenu!)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        handleMouseEnter(item.megaMenu!);
+                      }
+                    }}
                     className={`text-sm font-medium transition-colors hover:text-foreground inline-flex items-center gap-1 py-1 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground rounded-sm ${
                       isActive || isMegaActive ? 'text-foreground font-semibold' : 'text-muted-foreground'
                     }`}
@@ -343,17 +430,27 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Search Bar (Desktop) */}
         <div className="flex-1 max-w-sm hidden sm:block">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <form
+            role="search"
+            onSubmit={(e) => handleSearchFormSubmit(e, false)}
+            className="relative"
+          >
+            <button
+              type="submit"
+              aria-label="Tìm kiếm"
+              className="absolute left-0 top-0 bottom-0 px-2.5 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Search className="h-3.5 w-3.5" />
+            </button>
             <Input
               type="search"
               placeholder="Tìm kiếm sản phẩm..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-              onKeyDown={handleSearchKeyDown}
+              value={effectiveSearchQuery}
+              onChange={(e) => handleSearchInputChange(e.target.value)}
+              onKeyDown={(e) => handleSearchKeyDown(e, false)}
               className="w-full pl-8 h-8 text-xs bg-secondary/50 border-input focus:bg-background transition-colors"
             />
-          </div>
+          </form>
         </div>
 
         {/* Action Buttons */}
@@ -574,20 +671,22 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Desktop Mega Menu Dropdown */}
       {activeMegaMenu && (
-        <MegaMenu
-          type={activeMegaMenu}
-          isOpen={Boolean(activeMegaMenu)}
-          onClose={handleCloseMegaMenu}
-          categories={categories}
-          isLoading={isCategoriesLoading}
-          onMouseEnter={() => {
-            if (closeTimerRef.current) {
-              clearTimeout(closeTimerRef.current);
-              closeTimerRef.current = null;
-            }
-          }}
-          onMouseLeave={handleMouseLeave}
-        />
+        <div ref={megaMenuPanelRef}>
+          <MegaMenu
+            type={activeMegaMenu}
+            isOpen={Boolean(activeMegaMenu)}
+            onClose={handleCloseMegaMenu}
+            categories={categories}
+            isLoading={isCategoriesLoading}
+            onMouseEnter={() => {
+              if (closeTimerRef.current) {
+                clearTimeout(closeTimerRef.current);
+                closeTimerRef.current = null;
+              }
+            }}
+            onMouseLeave={handleMouseLeave}
+          />
+        </div>
       )}
 
       {/* Mobile Drawer Navigation */}
@@ -605,22 +704,27 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* Mobile Search inside drawer */}
             <div className="p-3 border-b border-border">
-              <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+              <form
+                role="search"
+                onSubmit={(e) => handleSearchFormSubmit(e, true)}
+                className="relative"
+              >
+                <button
+                  type="submit"
+                  aria-label="Tìm kiếm"
+                  className="absolute left-0 top-0 bottom-0 px-2.5 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Search className="h-3.5 w-3.5" />
+                </button>
                 <Input
                   type="search"
                   placeholder="Tìm kiếm sản phẩm..."
-                  value={searchQuery}
-                  onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && searchQuery.trim()) {
-                      setIsMobileNavOpen(false);
-                      navigate(`/products?keyword=${encodeURIComponent(searchQuery.trim())}`);
-                    }
-                  }}
+                  value={effectiveSearchQuery}
+                  onChange={(e) => handleSearchInputChange(e.target.value)}
+                  onKeyDown={(e) => handleSearchKeyDown(e, true)}
                   className="w-full pl-8 h-8 text-xs bg-secondary/50 border-input focus:bg-background"
                 />
-              </div>
+              </form>
             </div>
 
             {/* Navigation links & Dynamic Collapsibles */}
@@ -685,7 +789,7 @@ export const Header: React.FC<HeaderProps> = ({
                             onClick={() => setIsMobileNavOpen(false)}
                             className="block px-2 py-1 text-muted-foreground hover:text-foreground"
                           >
-                            {child.name}
+                            {formatCategoryName(child.slug, child.name)}
                           </Link>
                         ))}
                       </>

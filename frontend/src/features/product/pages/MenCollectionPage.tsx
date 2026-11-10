@@ -113,7 +113,7 @@ export const MenCollectionPage: React.FC = () => {
                   to={`/products?categoryId=${child.id}`}
                   className="h-7 px-3 text-xs rounded-full whitespace-nowrap transition-colors border border-border bg-card text-muted-foreground hover:text-foreground hover:border-foreground inline-flex items-center"
                 >
-                  {child.name}
+                  {child.slug === 'ao-ba-lo' ? 'Áo Ba Lỗ' : child.name}
                 </Link>
               ))}
             </div>
@@ -199,7 +199,7 @@ export const MenCollectionPage: React.FC = () => {
                   to={`/products?categoryId=${child.id}`}
                   className="h-7 px-3 text-xs rounded-full whitespace-nowrap transition-colors border border-border bg-card text-muted-foreground hover:text-foreground hover:border-foreground inline-flex items-center"
                 >
-                  {child.name}
+                  {child.slug === 'ao-ba-lo' ? 'Áo Ba Lỗ' : child.name}
                 </Link>
               ))}
             </div>

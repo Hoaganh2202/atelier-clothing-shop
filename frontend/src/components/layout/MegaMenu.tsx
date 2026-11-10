@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import type { CategoryPublicResponse } from '@/features/product/api/product.api';
 
 interface MegaMenuProps {
@@ -11,6 +11,13 @@ interface MegaMenuProps {
   isLoading?: boolean;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
+}
+
+function formatCategoryLabel(category: CategoryPublicResponse): string {
+  if (category.slug === 'ao-ba-lo') {
+    return 'Áo Ba Lỗ';
+  }
+  return category.name || '';
 }
 
 export const MegaMenu: React.FC<MegaMenuProps> = ({
@@ -26,13 +33,11 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
 
   const isMen = type === 'men';
 
-  // Find parent categories dynamically by slug from API
   const aoNamCat = categories.find((c) => c.slug === 'ao-nam');
   const quanNamCat = categories.find((c) => c.slug === 'quan-nam');
   const aoNuCat = categories.find((c) => c.slug === 'ao-nu');
   const quanNuCat = categories.find((c) => c.slug === 'quan-nu');
 
-  // Loading skeleton state
   if (isLoading) {
     return (
       <div
@@ -44,32 +49,30 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
       >
         <div className="mx-auto max-w-[1280px] px-6 py-6">
           <div className="grid grid-cols-12 gap-8">
-            <div className="col-span-3 space-y-3">
-              <div className="h-4 w-24 bg-secondary/60 rounded animate-pulse" />
+            <div className="col-span-4 space-y-3">
+              <div className="h-4 w-24 bg-secondary/60 rounded-md animate-pulse" />
               <div className="h-px bg-border" />
               <div className="space-y-2 pt-1">
-                <div className="h-3 w-32 bg-secondary/60 rounded animate-pulse" />
-                <div className="h-3 w-28 bg-secondary/60 rounded animate-pulse" />
-                <div className="h-3 w-36 bg-secondary/60 rounded animate-pulse" />
+                <div className="h-3 w-32 bg-secondary/60 rounded-md animate-pulse" />
+                <div className="h-3 w-28 bg-secondary/60 rounded-md animate-pulse" />
+                <div className="h-3 w-36 bg-secondary/60 rounded-md animate-pulse" />
               </div>
             </div>
-            <div className="col-span-3 space-y-3">
-              <div className="h-4 w-24 bg-secondary/60 rounded animate-pulse" />
+            <div className="col-span-4 space-y-3">
+              <div className="h-4 w-24 bg-secondary/60 rounded-md animate-pulse" />
               <div className="h-px bg-border" />
               <div className="space-y-2 pt-1">
-                <div className="h-3 w-32 bg-secondary/60 rounded animate-pulse" />
-                <div className="h-3 w-28 bg-secondary/60 rounded animate-pulse" />
+                <div className="h-3 w-32 bg-secondary/60 rounded-md animate-pulse" />
+                <div className="h-3 w-28 bg-secondary/60 rounded-md animate-pulse" />
               </div>
             </div>
-            <div className="col-span-3 space-y-3">
-              <div className="h-4 w-28 bg-secondary/60 rounded animate-pulse" />
+            <div className="col-span-4 space-y-3">
+              <div className="h-4 w-28 bg-secondary/60 rounded-md animate-pulse" />
               <div className="h-px bg-border" />
               <div className="space-y-2 pt-1">
-                <div className="h-3 w-36 bg-secondary/60 rounded animate-pulse" />
-                <div className="h-3 w-30 bg-secondary/60 rounded animate-pulse" />
+                <div className="h-3 w-40 bg-secondary/60 rounded-md animate-pulse" />
               </div>
             </div>
-            <div className="col-span-3 h-32 bg-secondary/40 rounded-md animate-pulse" />
           </div>
         </div>
       </div>
@@ -89,9 +92,9 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
           {isMen ? (
             <>
               {/* Column 1: Áo Nam */}
-              <div className="col-span-3 space-y-3">
+              <div className="col-span-4 space-y-3">
                 <Link
-                  to={aoNamCat?.id ? `/products?categoryId=${aoNamCat.id}` : '/products'}
+                  to={aoNamCat?.id ? `/products?categoryId=${aoNamCat.id}` : '/collections/men'}
                   onClick={onClose}
                   className="group flex items-center justify-between text-xs font-bold uppercase tracking-wider text-foreground hover:text-muted-foreground transition-colors"
                 >
@@ -108,7 +111,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
                           onClick={onClose}
                           className="text-muted-foreground hover:text-foreground transition-colors block py-0.5"
                         >
-                          {child.name}
+                          {formatCategoryLabel(child)}
                         </Link>
                       </li>
                     ))
@@ -122,7 +125,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
                         onClick={onClose}
                         className="text-[11px] font-semibold text-foreground hover:underline inline-flex items-center gap-1"
                       >
-                        Tất cả áo nam
+                        <span>Tất cả áo nam</span>
                         <ArrowRight className="h-2.5 w-2.5" />
                       </Link>
                     </li>
@@ -131,9 +134,9 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
               </div>
 
               {/* Column 2: Quần Nam */}
-              <div className="col-span-3 space-y-3">
+              <div className="col-span-4 space-y-3">
                 <Link
-                  to={quanNamCat?.id ? `/products?categoryId=${quanNamCat.id}` : '/products'}
+                  to={quanNamCat?.id ? `/products?categoryId=${quanNamCat.id}` : '/collections/men'}
                   onClick={onClose}
                   className="group flex items-center justify-between text-xs font-bold uppercase tracking-wider text-foreground hover:text-muted-foreground transition-colors"
                 >
@@ -150,7 +153,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
                           onClick={onClose}
                           className="text-muted-foreground hover:text-foreground transition-colors block py-0.5"
                         >
-                          {child.name}
+                          {formatCategoryLabel(child)}
                         </Link>
                       </li>
                     ))
@@ -164,7 +167,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
                         onClick={onClose}
                         className="text-[11px] font-semibold text-foreground hover:underline inline-flex items-center gap-1"
                       >
-                        Tất cả quần nam
+                        <span>Tất cả quần nam</span>
                         <ArrowRight className="h-2.5 w-2.5" />
                       </Link>
                     </li>
@@ -172,83 +175,33 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
                 </ul>
               </div>
 
-              {/* Column 3: Tiêu điểm & Điều hướng */}
-              <div className="col-span-3 space-y-3">
+              {/* Column 3: Điều hướng tổng hợp Thời trang Nam */}
+              <div className="col-span-4 space-y-3">
                 <span className="text-xs font-bold uppercase tracking-wider text-foreground block">
-                  Tiêu điểm nam
+                  Thời trang Nam
                 </span>
                 <div className="h-px bg-border" />
-                <ul className="space-y-2.5 text-xs">
-                  <li>
-                    <Link
-                      to="/collections/men"
-                      onClick={onClose}
-                      className="font-medium text-foreground hover:underline flex items-center justify-between"
-                    >
-                      <span>Xem tất cả thời trang nam</span>
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/new-arrivals"
-                      onClick={onClose}
-                      className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
-                    >
-                      <Sparkles className="h-3 w-3 text-foreground" />
-                      <span>Hàng mới về</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/collections"
-                      onClick={onClose}
-                      className="text-muted-foreground hover:text-foreground transition-colors block"
-                    >
-                      Bộ sưu tập thiết kế
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/collections/accessories"
-                      onClick={onClose}
-                      className="text-muted-foreground hover:text-foreground transition-colors block"
-                    >
-                      Phụ kiện nam đồng bộ
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Column 4: Editorial Feature Box */}
-              <div className="col-span-3 rounded-md border border-border bg-secondary/50 p-4 flex flex-col justify-between">
-                <div>
-                  <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block mb-1">
-                    Atelier Men
-                  </span>
-                  <h4 className="text-sm font-bold text-foreground leading-snug mb-1.5">
-                    Thời trang tối giản thường nhật
-                  </h4>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Chất liệu cotton tự nhiên, phom dáng thoải mái bền vững cùng thời gian.
-                  </p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Tuyển tập các thiết kế áo và quần nam phom dáng chuẩn mực, chất liệu tự nhiên bền bỉ cho tủ đồ thường nhật.
+                </p>
+                <div className="pt-1">
+                  <Link
+                    to="/collections/men"
+                    onClick={onClose}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground hover:underline"
+                  >
+                    <span>Xem tất cả thời trang nam</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
                 </div>
-                <Link
-                  to="/collections/men"
-                  onClick={onClose}
-                  className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-foreground underline underline-offset-4 hover:text-muted-foreground"
-                >
-                  Khám phá ngay
-                  <ArrowRight className="h-3 w-3" />
-                </Link>
               </div>
             </>
           ) : (
             <>
               {/* Column 1: Áo Nữ */}
-              <div className="col-span-3 space-y-3">
+              <div className="col-span-4 space-y-3">
                 <Link
-                  to={aoNuCat?.id ? `/products?categoryId=${aoNuCat.id}` : '/products'}
+                  to={aoNuCat?.id ? `/products?categoryId=${aoNuCat.id}` : '/collections/women'}
                   onClick={onClose}
                   className="group flex items-center justify-between text-xs font-bold uppercase tracking-wider text-foreground hover:text-muted-foreground transition-colors"
                 >
@@ -265,7 +218,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
                           onClick={onClose}
                           className="text-muted-foreground hover:text-foreground transition-colors block py-0.5"
                         >
-                          {child.name}
+                          {formatCategoryLabel(child)}
                         </Link>
                       </li>
                     ))
@@ -279,7 +232,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
                         onClick={onClose}
                         className="text-[11px] font-semibold text-foreground hover:underline inline-flex items-center gap-1"
                       >
-                        Tất cả áo nữ
+                        <span>Tất cả áo nữ</span>
                         <ArrowRight className="h-2.5 w-2.5" />
                       </Link>
                     </li>
@@ -287,14 +240,14 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
                 </ul>
               </div>
 
-              {/* Column 2: Quần & Váy Nữ */}
-              <div className="col-span-3 space-y-3">
+              {/* Column 2: Quần Nữ */}
+              <div className="col-span-4 space-y-3">
                 <Link
-                  to={quanNuCat?.id ? `/products?categoryId=${quanNuCat.id}` : '/products'}
+                  to={quanNuCat?.id ? `/products?categoryId=${quanNuCat.id}` : '/collections/women'}
                   onClick={onClose}
                   className="group flex items-center justify-between text-xs font-bold uppercase tracking-wider text-foreground hover:text-muted-foreground transition-colors"
                 >
-                  <span>{quanNuCat?.name || 'Quần & Váy Nữ'}</span>
+                  <span>{quanNuCat?.name || 'Quần Nữ'}</span>
                   <ArrowRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </Link>
                 <div className="h-px bg-border" />
@@ -307,7 +260,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
                           onClick={onClose}
                           className="text-muted-foreground hover:text-foreground transition-colors block py-0.5"
                         >
-                          {child.name}
+                          {formatCategoryLabel(child)}
                         </Link>
                       </li>
                     ))
@@ -321,7 +274,7 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
                         onClick={onClose}
                         className="text-[11px] font-semibold text-foreground hover:underline inline-flex items-center gap-1"
                       >
-                        Tất cả quần & váy
+                        <span>Tất cả quần & váy</span>
                         <ArrowRight className="h-2.5 w-2.5" />
                       </Link>
                     </li>
@@ -329,75 +282,25 @@ export const MegaMenu: React.FC<MegaMenuProps> = ({
                 </ul>
               </div>
 
-              {/* Column 3: Tiêu điểm Nữ */}
-              <div className="col-span-3 space-y-3">
+              {/* Column 3: Điều hướng tổng hợp Thời trang Nữ */}
+              <div className="col-span-4 space-y-3">
                 <span className="text-xs font-bold uppercase tracking-wider text-foreground block">
-                  Tiêu điểm nữ
+                  Thời trang Nữ
                 </span>
                 <div className="h-px bg-border" />
-                <ul className="space-y-2.5 text-xs">
-                  <li>
-                    <Link
-                      to="/collections/women"
-                      onClick={onClose}
-                      className="font-medium text-foreground hover:underline flex items-center justify-between"
-                    >
-                      <span>Xem tất cả thời trang nữ</span>
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/new-arrivals"
-                      onClick={onClose}
-                      className="text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
-                    >
-                      <Sparkles className="h-3 w-3 text-foreground" />
-                      <span>Hàng mới về</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/collections"
-                      onClick={onClose}
-                      className="text-muted-foreground hover:text-foreground transition-colors block"
-                    >
-                      Bộ sưu tập thiết kế
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="/collections/accessories"
-                      onClick={onClose}
-                      className="text-muted-foreground hover:text-foreground transition-colors block"
-                    >
-                      Phụ kiện nữ đồng bộ
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Column 4: Editorial Feature Box */}
-              <div className="col-span-3 rounded-md border border-border bg-secondary/50 p-4 flex flex-col justify-between">
-                <div>
-                  <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground block mb-1">
-                    Atelier Women
-                  </span>
-                  <h4 className="text-sm font-bold text-foreground leading-snug mb-1.5">
-                    Thanh lịch & Phóng khoáng
-                  </h4>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Phom dáng tự nhiên, đường cắt may tỉ mỉ tôn vinh phong thái nhẹ nhàng.
-                  </p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Tôn vinh nét thanh lịch tự nhiên với sơ mi lụa, áo kiểu tinh tế và các thiết kế đầm váy duyên dáng.
+                </p>
+                <div className="pt-1">
+                  <Link
+                    to="/collections/women"
+                    onClick={onClose}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground hover:underline"
+                  >
+                    <span>Xem tất cả thời trang nữ</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
                 </div>
-                <Link
-                  to="/collections/women"
-                  onClick={onClose}
-                  className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-foreground underline underline-offset-4 hover:text-muted-foreground"
-                >
-                  Khám phá ngay
-                  <ArrowRight className="h-3 w-3" />
-                </Link>
               </div>
             </>
           )}
